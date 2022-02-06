@@ -1,7 +1,7 @@
 package com.example.tinkoffapp.data
 
-import android.content.Context
 import com.example.tinkoffapp.entity.Photo
+import com.example.tinkoffapp.entity.StateApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,11 +22,15 @@ object DataManger {
     }
 
     fun prev() = CoroutineScope(Dispatchers.Main).launch {
-
+        listeners.forEach { it.updatePhoto(Photo(StateApp.LOADING.urlImg)) }
+        val photo = RandomPhotosRepo.getPrevPhoto()
+        listeners.forEach { it.updatePhoto(photo) }
     }
 
-    fun next() {
-
+    fun next() = CoroutineScope(Dispatchers.Main).launch {
+        listeners.forEach { it.updatePhoto(Photo(StateApp.LOADING.urlImg)) }
+        val photo = RandomPhotosRepo.getNextPhoto()
+        listeners.forEach { it.updatePhoto(photo) }
     }
 
     interface Callback {

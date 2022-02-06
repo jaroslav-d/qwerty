@@ -1,6 +1,5 @@
 package com.example.tinkoffapp
 
-import android.graphics.Bitmap
 import com.bumptech.glide.Glide
 import com.example.tinkoffapp.data.DataManger
 import com.example.tinkoffapp.databinding.FragmentMainBinding

@@ -1,7 +1,5 @@
 package com.example.tinkoffapp.entity
 
-import android.graphics.Bitmap
-
 interface Repository {
     suspend fun getCurrentPhoto(): Photo
     suspend fun getPrevPhoto(): Photo
