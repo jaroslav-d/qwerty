@@ -1,15 +1,12 @@
 package com.example.tinkoffapp.data
 
-import com.example.tinkoffapp.entity.Category
-import com.example.tinkoffapp.entity.Photo
-import com.example.tinkoffapp.entity.Repository
-import com.example.tinkoffapp.entity.StateApp
+import com.example.tinkoffapp.entity.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RandomPhotosRepo : Repository {
 
-    var state = StateApp.LOADING
+    var state = StateWrapper(StateApp.LOADING)
     val source: RemoteSource = Retrofit.Builder()
         .baseUrl("https://developerslife.ru/")
         .addConverterFactory(GsonConverterFactory.create())
@@ -17,24 +14,26 @@ object RandomPhotosRepo : Repository {
         .create(RemoteSource::class.java)
 
     override suspend fun getCurrentPhoto(): Photo {
-        return Photo(state.urlImg)
+        return state.photo
     }
 
     override suspend fun getPrevPhoto(): Photo {
-        return Photo("http://static.devli.ru/public/images/gifs/201309/16a6b156-20f9-4261-8bc0-862d754792d1.gif")
+        return state.toPrev().photo
     }
 
     override suspend fun getNextPhoto(): Photo {
-        return try {
-            val test = "http://static.devli.ru/public/images/gifs/201405/3aebb1c0-d943-44dc-8a21-e6be9eada500.gif"
-            val url = source.request().gifURL
-            state = StateApp.LOADED
-            state.urlImg = url
-            Photo(state.urlImg)
-        } catch (e: Exception) {
-            state = StateApp.ERROR
-            Photo(state.urlImg)
+        if (state.toNext() == StateApp.LOADED) {
+            return state.photo
         }
+        state.current = try {
+            val url = source.request().gifURL
+            StateApp.LOADED.apply {
+                photo = Photo(url)
+            }
+        } catch (e: Exception) {
+            StateApp.ERROR
+        }
+        return state.photo
     }
 
     override suspend fun setCategory(category: Category) = Unit
