@@ -5,31 +5,31 @@ import com.example.tinkoffapp.entity.StateApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 object DataManger {
 
     private val listeners = mutableListOf<Callback>()
 
-    fun addListener(listener: Callback) {
-        if (listeners.isEmpty()) CoroutineScope(Dispatchers.Main).launch { RandomPhotosRepo.getNextPhoto() }
+    fun addListener(listener: Callback) = CoroutineScope(Dispatchers.Main).launch {
+        if (listeners.isEmpty()) next()
         listeners.add(listener)
-        CoroutineScope(Dispatchers.Main).launch {
-            listener.updatePhoto(RandomPhotosRepo.getCurrentPhoto())
-        }
+        listener.updatePhoto(RandomPhotosRepo.getCurrentPhoto())
     }
 
     fun removeListener(listener: Callback) {
         listeners.remove(listener)
     }
 
-    fun prev() = CoroutineScope(Dispatchers.Main).launch {
+    fun prev() = CoroutineScope(Dispatchers.IO).launch {
         val photo = RandomPhotosRepo.getPrevPhoto()
-        listeners.forEach { it.updatePhoto(photo) }
+        withContext(Dispatchers.Main) { listeners.forEach { it.updatePhoto(photo) } }
     }
 
-    fun next() = CoroutineScope(Dispatchers.Main).launch {
+    fun next() = CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.Main) { listeners.forEach { it.updatePhoto(StateApp.LOADING.photo) } }
         val photo = RandomPhotosRepo.getNextPhoto()
-        listeners.forEach { it.updatePhoto(photo) }
+        withContext(Dispatchers.Main) { listeners.forEach { it.updatePhoto(photo) } }
     }
 
     interface Callback {

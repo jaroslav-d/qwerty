@@ -14,7 +14,7 @@ object RandomPhotosRepo : Repository {
         .create(RemoteSource::class.java)
 
     override suspend fun getCurrentPhoto(): Photo {
-        return state.photo
+        return state.current.photo
     }
 
     override suspend fun getPrevPhoto(): Photo {
@@ -23,7 +23,7 @@ object RandomPhotosRepo : Repository {
 
     override suspend fun getNextPhoto(): Photo {
         if (state.toNext() == StateApp.LOADED) {
-            return state.photo
+            return state.current.photo
         }
         state.current = try {
             val url = source.request().gifURL
@@ -33,7 +33,7 @@ object RandomPhotosRepo : Repository {
         } catch (e: Exception) {
             StateApp.ERROR
         }
-        return state.photo
+        return state.current.photo
     }
 
     override suspend fun setCategory(category: Category) = Unit
