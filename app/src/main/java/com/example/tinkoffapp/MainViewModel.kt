@@ -8,7 +8,12 @@ import com.example.tinkoffapp.entity.Photo
 class MainViewModel(private val binding: FragmentMainBinding) : DataManger.Callback {
 
     override fun updatePhoto(photo: Photo) {
-        Glide.with(binding.root).asGif().load(photo.url).into(binding.photo)
+        Glide.with(binding.root)
+            .asGif()
+            .load(photo.url)
+            .placeholder(R.drawable.loading)
+            .error(R.drawable.error)
+            .into(binding.photo)
     }
 
 }

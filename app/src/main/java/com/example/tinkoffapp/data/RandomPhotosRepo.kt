@@ -6,8 +6,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RandomPhotosRepo : Repository {
 
-    var state = StateWrapper(StateApp.LOADING)
-    val source: RemoteSource = Retrofit.Builder()
+    private val state = StateWrapper()
+    private val source: RemoteSource = Retrofit.Builder()
         .baseUrl("https://developerslife.ru/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
@@ -22,16 +22,16 @@ object RandomPhotosRepo : Repository {
     }
 
     override suspend fun getNextPhoto(): Photo {
-        if (state.toNext() == StateApp.LOADED) {
+        if (state.toNext() is StateApp.LOADED) {
             return state.current.photo
         }
         state.current = try {
             val url = source.request().gifURL
-            StateApp.LOADED.apply {
+            StateApp.LOADED().apply {
                 photo = Photo(url)
             }
         } catch (e: Exception) {
-            StateApp.ERROR
+            StateApp.ERROR()
         }
         return state.current.photo
     }

@@ -1,6 +1,6 @@
 package com.example.tinkoffapp.entity
 
-class StateWrapper(var state: StateApp) {
+class StateWrapper(private var state: StateApp = StateApp.LOADING()) {
 
     var current: StateApp by ::state
 
@@ -8,11 +8,11 @@ class StateWrapper(var state: StateApp) {
     private val nextStates = mutableListOf<StateApp>()
 
     fun toNext(): StateApp {
-        if (state == StateApp.LOADING) return state
-        if (state == StateApp.ERROR) return state
+        if (state is StateApp.LOADING) return state
+        if (state is StateApp.ERROR) return state
         prevStates.add(state)
         state = if (nextStates.isEmpty()) {
-            StateApp.LOADING
+            StateApp.LOADING()
         } else {
             val currentState = nextStates.last()
             nextStates.remove(currentState)

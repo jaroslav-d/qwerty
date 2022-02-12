@@ -27,7 +27,7 @@ object DataManger {
     }
 
     fun next() = CoroutineScope(Dispatchers.IO).launch {
-        withContext(Dispatchers.Main) { listeners.forEach { it.updatePhoto(StateApp.LOADING.photo) } }
+        withContext(Dispatchers.Main) { listeners.forEach { it.updatePhoto(StateApp.LOADING().photo) } }
         val photo = RandomPhotosRepo.getNextPhoto()
         withContext(Dispatchers.Main) { listeners.forEach { it.updatePhoto(photo) } }
     }
